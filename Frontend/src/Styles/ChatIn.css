@@ -1,11 +1,13 @@
 /* ✅ FULL PAGE */
 .chat-page-container {
-  height: 100vh;
+  height: 100dvh;
   width: 100%;
   background: #ffffff;
   display: flex;
   flex-direction: column;
   font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  position: relative;
 }
 
 /* ✅ HEADER */
@@ -138,7 +140,7 @@
 
 /* ✅ LOADING */
 .chat-loading {
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;

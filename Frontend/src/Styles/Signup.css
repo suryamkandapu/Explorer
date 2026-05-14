@@ -17,7 +17,7 @@ html, body, #root {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   padding: 20px;
   background: url('https://img.freepik.com/premium-photo/blue-white-wavy-lines_81048-32428.jpg') no-repeat center center / cover;
