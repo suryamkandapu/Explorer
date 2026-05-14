@@ -7,6 +7,7 @@ import { API_URL } from '../../../ConfigApi/Api';
 const Signin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -17,11 +18,19 @@ const Signin = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    // Password validation
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      return;
+    }
+
+    setPasswordError("");
     setLoading(true);
 
     const data = {
       email,
-      password, 
+      password,
     };
 
     try {
@@ -36,13 +45,13 @@ const Signin = () => {
       }
 
     } catch (error) {
-        if (error.response?.data?.message) {
-            alert(error.response.data.message);
-        } 
-        else {
-            alert('Something went wrong. Please try again.');
-        }
-       console.error('Login error:', error);
+      if (error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert('Something went wrong. Please try again.');
+      }
+
+      console.error('Login error:', error);
 
     } finally {
       setLoading(false);
@@ -53,7 +62,9 @@ const Signin = () => {
     <div className='signin-container'>
       <div className='signin-card'>
         <h1 className='signin-title'>Sign In</h1>
+
         <form className='signin-form' onSubmit={submitHandler}>
+          
           <div className='form-group'>
             <label className='form-label'>Email</label>
             <input
@@ -74,13 +85,26 @@ const Signin = () => {
               type='password'
               name='password'
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+
+                if (e.target.value.length < 6) {
+                  setPasswordError("Password must be at least 6 characters");
+                } else {
+                  setPasswordError("");
+                }
+              }}
               placeholder='Enter your password'
               required
             />
-          </div>
 
-          
+            {/* Error message */}
+            {passwordError && (
+              <p style={{color: "red", fontSize: "13px", marginTop: "4px"}}>
+                {passwordError}
+              </p>
+            )}
+          </div>
 
           <button className='submit-btn' type='submit' disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
@@ -89,6 +113,7 @@ const Signin = () => {
           <div className='signup-link'>
             Don't have an account? <Link to='/signup'>Create one</Link>
           </div>
+
         </form>
       </div>
     </div>

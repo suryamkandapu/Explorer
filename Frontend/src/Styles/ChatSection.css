@@ -1,0 +1,116 @@
+.chat-top-section {
+  width: 100%;
+  padding: 14px 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+/* ✅ SEARCH BAR */
+.chat-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f5f5f5;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.chat-search-icon {
+  font-size: 18px;
+  color: #888;
+}
+
+.chat-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+  color: #111;
+}
+
+/* ✅ ACTIVE NOW HEADER */
+.active-now-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+
+.active-now-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.active-now-count {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+.active-now-empty {
+  font-size: 13px;
+  color: #999;
+  margin: 0;
+  padding: 8px 0;
+}
+
+/* ✅ HORIZONTAL SCROLL (INSTAGRAM STORY STYLE) */
+.active-now-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.active-now-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ✅ ACTIVE USER CARD */
+.active-user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 62px;
+  cursor: pointer;
+}
+
+.active-avatar-wrapper {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+
+.active-user-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #ddd;
+}
+
+.active-dot {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 12px;
+  height: 12px;
+  background: #2ecc71;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.active-user-name {
+  font-size: 12px;
+  margin-top: 6px;
+  color: #222;
+  font-weight: 500;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

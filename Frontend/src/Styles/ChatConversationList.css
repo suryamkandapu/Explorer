@@ -1,0 +1,136 @@
+/* ✅ MAIN LAYOUT (ChatConversationList page) */
+.chat-layout-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.chat-main-content {
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 14px;
+  display: flex;
+  gap: 18px;
+  box-sizing: border-box;
+}
+
+/* ✅ LEFT SIDE (ChartSection panel) */
+
+/* Gemini avatar (emoji) sizing */
+.gemini-avatar {
+  font-size: 24px;
+}
+.gemini-avatar img {
+  border-radius: 50%;
+}
+
+.chat-main-content .chart-section {
+  width: 330px;
+  min-width: 280px;
+  height: fit-content;
+
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 14px;
+  padding: 16px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ✅ RIGHT SIDE (Chat list panel) */
+.chat-user-list {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 14px;
+  overflow: hidden;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ✅ Chat row */
+.chat-user-card {
+  border-bottom: 1px solid #f2f2f2;
+  transition: background 0.2s ease;
+}
+
+.chat-user-card:last-child {
+  border-bottom: none;
+}
+
+/* ✅ Link */
+.chat-user-card a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+.chat-user-card:hover {
+  background: #f7f7f7;
+}
+
+/* ✅ Avatar */
+.chat-user-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #eeeeee;
+}
+
+/* ✅ User Info */
+.chat-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.chat-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+}
+
+.chat-user-subtext {
+  font-size: 13px;
+  color: #777;
+  margin: 4px 0 0 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ✅ Loading/Error */
+.chat-loading,
+.chat-error,
+.chat-empty {
+  width: 100%;
+  text-align: center;
+  padding: 40px 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* ✅ RESPONSIVE (Mobile) */
+@media (max-width: 900px) {
+  .chat-main-content {
+    flex-direction: column;
+  }
+
+  .chat-main-content .chart-section {
+    width: 100%;
+  }
+
+  .chat-user-list {
+    width: 100%;
+  }
+}

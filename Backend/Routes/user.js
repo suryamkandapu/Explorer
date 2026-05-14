@@ -6,7 +6,8 @@ const bcrypt = require('bcrypt');
 const { signupUser , signinUser , protectedRoute ,
         fetchAllProfiles ,fetchProfile , fetchFollowers ,
         fetchFollowersCount , fetchLoggedInUser , handleLogout,
-        fetchFollowingList , fetchLikedProfiles} = require('../Controllers/user.controller');
+        fetchFollowingList , fetchLikedProfiles , fetchUsersBySearch ,
+        updateBio , fetchUsersByIds} = require('../Controllers/user.controller');
 
 
 router.post('/signup' ,uploadProfile.single('profilePic'), signupUser);
@@ -19,6 +20,10 @@ router.post('/follow/:id', fetchFollowersCount);
 router.get('/userProfile' , fetchLoggedInUser);
 router.post('/logout' , handleLogout);
 router.get('/following/:userId' , fetchFollowingList)
+router.get('/searchProfile' , fetchUsersBySearch);
+router.put('/updateBio', updateBio);
+router.post('/getUsersByIds', fetchUsersByIds);
+
 
 
 module.exports = router;

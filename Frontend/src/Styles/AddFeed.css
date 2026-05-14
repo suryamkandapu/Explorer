@@ -1,0 +1,160 @@
+.addfeed-page {
+  min-height: 100vh;
+  background: #fafafa;
+  font-family: Arial, Helvetica, sans-serif;
+  padding-bottom: 80px;
+}
+
+/* ✅ Header */
+.addfeed-header {
+  background: #fff;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addfeed-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.addfeed-post-btn {
+  border: none;
+  background: #0095f6;
+  color: white;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.addfeed-post-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ✅ Card */
+.addfeed-card {
+  margin: 14px 14px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* ✅ Upload Box */
+.addfeed-upload-box {
+  width: 100%;
+  height: 220px;
+  border-radius: 14px;
+  border: 2px dashed #ddd;
+  background: #fcfcfc;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.addfeed-upload-box:hover {
+  border-color: #0095f6;
+  background: #f5fbff;
+}
+
+.upload-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #0095f6;
+  color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.upload-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.upload-subtitle {
+  font-size: 13px;
+  color: #888;
+  margin-top: 6px;
+}
+
+/* ✅ Preview */
+.addfeed-preview-box {
+  width: 100%;
+  height: 260px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  background: #000;
+}
+
+.addfeed-preview-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-media-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ✅ Caption */
+.addfeed-caption-box {
+  margin-top: 14px;
+}
+
+.caption-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.addfeed-caption-input {
+  width: 100%;
+  min-height: 90px;
+  resize: none;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.addfeed-caption-input:focus {
+  border-color: #0095f6;
+}
+
+.caption-count {
+  text-align: right;
+  font-size: 12px;
+  color: #888;
+  margin-top: 6px;
+}

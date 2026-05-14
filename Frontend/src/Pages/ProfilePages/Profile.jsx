@@ -12,7 +12,6 @@ const Profile = () => {
   
   const [loggedInUser , setLoggedInUser] = useState([]);
 
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -28,26 +27,23 @@ const Profile = () => {
     fetchProfile();
   }, [id]);
 
-  useEffect(()=>{
-  const fetchLoggedInUser = async () =>{
-    try{
+ useEffect(() => {
+  const fetchLoggedInUser = async () => {
+    try {
       const res = await axios.get(`${API_URL}/user/userProfile`, {
-        withCredentials: true, // This is required for cookie-based auth
+        withCredentials: true,
       });
-      if(res.data.success){
-         setLoggedInUser(res.data.user);
-   
+
+      if (res.data.success) {
+        setLoggedInUser(res.data.user);
       }
-      else{
-        
-        console.error('Failed to load user profile:', res.data.message);
-      }
-    }catch(err){
-      console.error('Failed to load user profile:', err);
+    } catch (err) {
+      console.log("Error fetching loggedInUser", err);
     }
-  }
+  };
+
   fetchLoggedInUser();
- }, [])
+}, []);
 
   if (!user) return <div>Loading...</div>;
 

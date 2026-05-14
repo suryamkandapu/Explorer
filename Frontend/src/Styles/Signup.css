@@ -138,6 +138,18 @@ html, body, #root {
   text-decoration: underline;
 }
 
+/* Password validation error */
+.password-error{
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Highlight input when invalid */
+.input-error{
+  border: 1px solid #ff6b6b;
+}
 /* Responsive Design */
 @media (max-width: 480px) {
   .signup-card {

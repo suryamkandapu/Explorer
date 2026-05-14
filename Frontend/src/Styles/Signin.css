@@ -120,6 +120,13 @@
     text-decoration: underline;
 }
 
+.password-error {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 480px) {
     .signin-container {

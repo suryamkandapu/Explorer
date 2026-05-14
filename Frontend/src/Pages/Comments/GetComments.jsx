@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 
 const GetComments = ({comments , onDeleteComment}) => {
   const [loggedInUserId, setLoggedInUserId] =useState(null);
-
+  // const navigate = useNavigate();
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -60,7 +60,6 @@ const GetComments = ({comments , onDeleteComment}) => {
   return (
     <div>       
            <div className="comments-container">
-            <h2 className="comments-title">Comments</h2>
             {comments.length === 0 ? (
         <div className="no-comments">
           No Comments posted yet. Be the first to comment!!

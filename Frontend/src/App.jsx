@@ -14,7 +14,10 @@ import ContentDetailed from './Pages/Home/FooterContent/ContentDetailed'
 import CommentSection from './Pages/Comments/CommentSection'
 import FollowingList from './Pages/UserPages/FollowingList'
 import LikedProfiles from './Pages/UserPages/LikedProfiles'
-
+import ChatUserList from './Pages/Home/FooterContent/ChatUserList'
+import ChatIn from './ChatPages/ChatIn'
+import AIChat from './ChatPages/AIChat'
+import SearchPage from './Pages/UserPages/SearchPage'
 const App = () => {
   return (
     <div>
@@ -32,7 +35,11 @@ const App = () => {
         <Route path='/commentSection' element={<ProtectedRoute><CommentSection/></ProtectedRoute>}/>
         <Route path='/userFollowing' element={<ProtectedRoute><FollowingList/></ProtectedRoute>}/>
         <Route path='/likedProfiles' element={<ProtectedRoute><LikedProfiles/></ProtectedRoute>}/>
-
+        <Route path='/messages' element={<ProtectedRoute><ChatUserList/></ProtectedRoute>}/>
+        <Route path='/chat/:id' element={<ProtectedRoute><ChatIn/></ProtectedRoute>}/>
+        <Route path='/chat/gemini' element={<ProtectedRoute><AIChat/></ProtectedRoute>}/>
+        <Route path='/search' element={<ProtectedRoute><SearchPage/></ProtectedRoute>}/>
+ 
       </Routes>
     </div>
   )

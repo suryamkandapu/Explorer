@@ -8,6 +8,7 @@ function createTokenForUser(user){
         email: user.email,
         profilePic: user.profilePic || 'https://i.pinimg.com/736x/c0/74/9b/c0749b7cc401421662ae901ec8f9f660.jpg',
     }
+    if (!JWT_SECRET) throw new Error('JWT_SECRET is not defined');
     const token = jwt.sign(payload, JWT_SECRET );
     return token;
 }

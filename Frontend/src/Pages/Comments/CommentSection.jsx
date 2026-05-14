@@ -1,7 +1,7 @@
 import React from 'react'
 import GetComments from './GetComments'
 import PostComments from './PostComments'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { API_URL } from '../../../ConfigApi/Api'
@@ -12,7 +12,7 @@ import {fetchCommentsByPostId} from './fetchCommentsByPostId';
 const CommentSection = () => {
     const location = useLocation();
   const postId = location.state?.postId; // Get post from location state
-
+    const navigate = useNavigate();
   const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -55,6 +55,14 @@ const CommentSection = () => {
 
   return (
     <div>
+        <div className='comments-header'>
+            <button className="Search-back-btn" onClick={() => navigate(-1)}>
+             ← 
+            </button>
+            <p className='comments-title'>Comments</p>
+        
+        </div>
+        
        <GetComments comments={comments} onDeleteComment={handleDeleteComment}/>
        <PostComments postId={postId} onNewComment={handleNewComment}/>
        

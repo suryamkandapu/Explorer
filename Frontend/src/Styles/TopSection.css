@@ -80,6 +80,27 @@ body {
   background-color: #007ac6;
 }
 
+.message-btn {
+  padding: 8px 18px;
+  margin-left: 14px;
+  border-radius: 8px;
+  border: none;
+  background-color: #262626; /* Instagram dark button */
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.message-btn:hover {
+  background-color: #000000;
+}
+
+.message-btn:active {
+  transform: scale(0.97);
+}
+
 
 .bio-section strong {
   display: block;
@@ -96,6 +117,114 @@ body {
   color: #0095f6;
   text-decoration: none;
   font-size: 14px;
+}
+
+/* ✅ BIO EDIT STYLES */
+.bio-edit-container {
+  background: #f9f9f9;
+  border: 2px solid #3797f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 8px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bio-edit-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #1c1c1c;
+}
+
+.bio-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s;
+  background-color: #fff;
+  color: #1c1c1c;
+  letter-spacing: 0.3px;
+  line-height: 1.5;
+}
+
+.bio-textarea::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.bio-textarea:focus {
+  border-color: #3797f0;
+  background-color: #fff;
+  color: #1c1c1c;
+  box-shadow: 0 0 0 3px rgba(55, 151, 240, 0.1);
+}
+
+.bio-char-count {
+  font-size: 12px;
+  color: #888;
+  margin: 6px 0 12px 0;
+  text-align: right;
+}
+
+.bio-button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.bio-btn-save,
+.bio-btn-cancel {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bio-btn-save {
+  background: #3797f0;
+  color: white;
+}
+
+.bio-btn-save:hover {
+  background: #3082d0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(55, 151, 240, 0.3);
+}
+
+.bio-btn-save:active {
+  transform: translateY(0);
+}
+
+.bio-btn-cancel {
+  background: #eee;
+  color: #1c1c1c;
+}
+
+.bio-btn-cancel:hover {
+  background: #ddd;
+}
+
+.bio-btn-cancel:active {
+  transform: scale(0.97);
 }
 
 .section1 {
@@ -124,7 +253,42 @@ body {
   transition: background-color 0.3s ease;
 }
 .logout-btn:hover {
-  background-color: #e63946;
+  background-color: #222020;
+}
+
+.profile-menu-dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  width: 160px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  z-index: 999;
+}
+
+.profile-menu-item {
+  width: 100%;
+  border: none;
+  background: white;
+  color: #000;
+  font-weight: 600;
+  padding: 9px;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.profile-menu-item:hover {
+  background: #f5f5f5;
+}
+
+.logout-item {
+  color: rgb(11, 11, 11);
+  font-weight: 600;
 }
 
 

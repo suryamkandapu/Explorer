@@ -1,48 +1,39 @@
 const FeedModel = require("../Models/UserFeed.model");
 const jwt = require("jsonwebtoken");
 const CommentModel = require("../Models/comment.model");
-const userModel = require('../Models/user.model');
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const { redisClient } = require("../Redis/redisClient");
+
+// ✅ Redis key helper
+const commentsKey = (postId) => `comments:${postId}`;
 
 const addComment = async (req, res) => {
   try {
-    const postId  = req.params.postId;
+    const postId = req.params.postId;
     const { text: comment } = req.body;
 
-    //  Check if user is authenticated
-     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-      if (!token) {
-        return res.status(401).json({
-          success: false,
-          message: 'Unauthorized'
-        });
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    //  Decode token to get user info
-    const decoded = jwt.verify(token, JWT_SECRET || "Surya123");
+    if (!JWT_SECRET) throw new Error('JWT_SECRET not set');
+    const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.id;
     const fullName = decoded.fullName;
     const userProfilePic = decoded.profilePic;
 
     if (!decoded || !userId || !fullName || !userProfilePic) {
-      return res.status(401).json({
-        success: false,
-        message: 'Unauthorized',
-      });
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    // Check if the post exists
     const post = await FeedModel.findById(postId);
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found',
-      });
+      return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    //  Create and save the comment
-    const newComment =  new  CommentModel({
+    const newComment = new CommentModel({
       postId,
       userId,
       fullName,
@@ -53,121 +44,118 @@ const addComment = async (req, res) => {
 
     await newComment.save();
 
+    // ✅ Clear cache for this post comments
+    await redisClient.del(commentsKey(postId));
+
     return res.status(200).json({
       success: true,
-      message: 'Comment added successfully',
+      message: "Comment added successfully",
       comment: newComment,
     });
-
   } catch (err) {
-    console.error('Add comment error:', err);
+    console.error("Add comment error:", err);
     return res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: "Server error",
       error: err.message,
     });
   }
 };
 
-const getComments = async (req , res) =>{
-    try{
-        const postId = req.params.postId;
-        if(!postId){
-            return res.status(400).json({
-                success: false,
-                message: 'Post ID is required'
-            });
-        }
-        const comments = await CommentModel.find({ postId }).sort({ date: -1 });
-        if (comments.length === 0) {
-            return res.status(200).json({
-                success: true,
-                message: 'No comments yet. Be the first to comment!',
-                comments: []
-            });
-        }
-       
-        return res.status(200).json({
-            success: true,
-            message: 'Comments retrieved successfully',
-            comments
-        });
-    }catch (err) {
-        console.error('Get comments error:', err);
-        return res.status(500).json({
-            success: false,
-            message: 'Server error',
-            error: err.message
-        });
+const getComments = async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    if (!postId) {
+      return res.status(400).json({ success: false, message: "Post ID is required" });
     }
-}
 
-const deleteComment = async (req , res)=>{
-    try{
-
-         const token = req.cookies.token;
-            if (!token) {
-              return res.status(401).json({
-                success: false,
-                message: 'Unauthorized'
-              });
-            }
-            const decoded = jwt.verify(token, JWT_SECRET || "Surya123");
-            const userIdFromToken = decoded.id;
-            if (!decoded || !userIdFromToken) {
-              return res.status(401).json({
-                success: false,
-                message: 'Unauthorized'
-              });
-            }
+    // ✅ Check Redis cache first
+    const cached = await redisClient.get(commentsKey(postId));
+    if (cached) {
+      console.log("Comments fetched from cache");
+      return res.status(200).json({
+        success: true,
+        message: "Comments retrieved successfully (cached)",
+        comments: JSON.parse(cached),
         
-        const commentId = req.params.commentId;
-        if(!commentId){
-            return res.status(401).json({
-                success: false,
-                message:"No commentId received"
-            })
-        }
-
-        // Check if the comment exists and belongs to the user
-        const comment = await CommentModel.findById(commentId);
-        if (!comment) {
-            return res.status(404).json({
-                success: false,
-                message: "Comment not found"
-            });
-        }
-        if (comment.userId.toString() !== userIdFromToken) {
-            return res.status(403).json({
-                success: false,
-                message: "You are not authorized to delete this comment"
-            });
-        }
-        // Delete the comment
-        const CommentToDelete = await CommentModel.findByIdAndDelete(commentId)
-        if(!CommentToDelete){
-            return res.status(401).json({
-                success: false,
-                message: "comment not found"
-            })
-        }
-        return res.status(200).json({
-            success: true,
-            loggedInUserId: userIdFromToken,
-            commentUserId: comment.userId,
-            message:"Comment deleted successfully"
-        })
-    }catch(err){
-         return res.status(500).json({
-                success: false,
-                message: "Internal server error"
-            })
+      })
     }
-}
 
+    // ✅ Fetch from MongoDB
+    const comments = await CommentModel.find({ postId }).sort({ date: -1 });
+
+    // ✅ Save to Redis (cache for 60 seconds)
+    await redisClient.setEx(commentsKey(postId), 60, JSON.stringify(comments));
+
+    return res.status(200).json({
+      success: true,
+      message: "Comments retrieved successfully",
+      comments,
+    });
+  } catch (err) {
+    console.error("Get comments error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+const deleteComment = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    if (!JWT_SECRET) throw new Error('JWT_SECRET not set');
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userIdFromToken = decoded.id;
+
+    if (!decoded || !userIdFromToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const commentId = req.params.commentId;
+    if (!commentId) {
+      return res.status(400).json({ success: false, message: "No commentId received" });
+    }
+
+    const comment = await CommentModel.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ success: false, message: "Comment not found" });
+    }
+
+    if (comment.userId.toString() !== userIdFromToken) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this comment",
+      });
+    }
+
+    await CommentModel.findByIdAndDelete(commentId);
+
+    // ✅ Clear cache for this post comments
+    await redisClient.del(commentsKey(comment.postId.toString()));
+
+    return res.status(200).json({
+      success: true,
+      message: "Comment deleted successfully",
+    });
+  } catch (err) {
+    console.error("Delete comment error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 
 module.exports = {
-    addComment,
-    getComments,
-    deleteComment
+  addComment,
+  getComments,
+  deleteComment,
 };
+
+

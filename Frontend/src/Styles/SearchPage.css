@@ -1,0 +1,97 @@
+.Search-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+}
+
+/* ✅ Top search bar like Instagram */
+.Search-topbar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 10px 12px;
+  border-bottom: 1px solid #dbdbdb;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 100;
+}
+
+.Search-back-btn {
+  border: none;
+  background: transparent;
+  font-size: 17px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  cursor: pointer;
+  padding: 4px 1px;
+  border-radius: 8px;
+  color: #040404;
+}
+
+.Search-back-btn:active {
+  background: #040404;
+}
+
+.Search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-style: italic;
+  background: #efefef;
+  color: #040404;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+/* ✅ results list */
+.Search-results {
+  padding: 10px 0;
+}
+
+.Search-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 14px;
+  text-decoration: none;
+  color: black;
+}
+
+.Search-user:hover {
+  background: #fafafa;
+}
+
+.Search-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #dbdbdb;
+}
+
+.Search-userinfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.Search-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.Search-sub {
+  margin: 0;
+  font-size: 12px;
+  color: gray;
+}
+
+.Search-status {
+  text-align: center;
+  margin-top: 40px;
+  color: gray;
+  font-size: 14px;
+}

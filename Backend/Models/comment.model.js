@@ -4,12 +4,12 @@ const commentSchema = new mongoose.Schema(
   {
     postId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Feed', // Reference to your feed/post model
+      ref: 'Feed', 
       required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Reference to your user model
+      ref: 'User', 
       required: true,
     },
     fullName: {

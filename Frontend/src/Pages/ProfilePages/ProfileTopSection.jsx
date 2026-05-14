@@ -4,16 +4,15 @@ import { useState } from 'react';
 import axios from 'axios';
 import { API_URL } from '../../../ConfigApi/Api';
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../../Styles/TopSection.css'
 
 
 const ProfileTopSection = ({user , loggedInUser }) => {
-    const [followers, setFollowers] = useState();
-    const [following, setFollowing] = useState(false);
-
-       const [postsLength, setPostLength] = useState([]);
-   
+      const [followers, setFollowers] = useState();
+      const [following, setFollowing] = useState(false);
+      const [postsLength, setPostLength] = useState([]);
+      const navigate = useNavigate();
        useEffect(() => {
            const fetchPosts = async () => {
                try {
@@ -28,7 +27,6 @@ const ProfileTopSection = ({user , loggedInUser }) => {
                    }
                } catch (err) {
                    console.error('Error fetching user posts length:', err);
-                  
                } 
            };
            fetchPosts();
@@ -43,10 +41,7 @@ const ProfileTopSection = ({user , loggedInUser }) => {
             setFollowers(user.followers); // initialize local count
         }
       }, [user, loggedInUser]);
-
-      
-    
-      const handleFollowersCount = async () => {
+const handleFollowersCount = async () => {
   try {
     const res = await axios.post(`${API_URL}/user/follow/${user._id}`, {}, {
       withCredentials: true,
@@ -97,7 +92,9 @@ const ProfileTopSection = ({user , loggedInUser }) => {
       </div>
 
       <div className="stat">
-        <Link to="/userFollowing" state={{ userId: user._id, followingList: user.followingList }} className="text-decoration-none text-dark"  ><strong>{user.followingList.length}</strong></Link>
+        <Link to="/userFollowing" state={{ userId: user._id, followingList: user.followingList }} className="text-decoration-none text-dark"  >
+            <strong>{user.followingList.length}</strong>
+        </Link>
         <span>following</span>
       </div>
     </div>
@@ -106,9 +103,14 @@ const ProfileTopSection = ({user , loggedInUser }) => {
 
       {user._id !== loggedInUser._id && (
         <button className='follow-btn' onClick={handleFollowersCount}>
-          {following ? "Unfollow" : "Follow"}
+            {following ? "Unfollow" : "Follow"}
         </button>
       )}
+      {user._id !== loggedInUser._id && (
+       <button className='message-btn' onClick={() => navigate(`/chat/${user._id}`)}>
+            Message
+        </button>
+      )}  
 
     <div className="bio-section">
       <p>{user.bio}</p>
