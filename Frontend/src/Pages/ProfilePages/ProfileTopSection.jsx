@@ -102,15 +102,24 @@ const handleFollowersCount = async () => {
      
 
       {user._id !== loggedInUser._id && (
-        <button className='follow-btn' onClick={handleFollowersCount}>
-            {following ? "Unfollow" : "Follow"}
-        </button>
-      )}
-      {user._id !== loggedInUser._id && (
-       <button className='message-btn' onClick={() => navigate(`/chat/${user._id}`)}>
-            Message
-        </button>
-      )}  
+  <div className="profile-action-buttons">
+
+    <button
+      className="follow-btn"
+      onClick={handleFollowersCount}
+    >
+      {following ? "Unfollow" : "Follow"}
+    </button>
+
+    <button
+      className="message-btn"
+      onClick={() => navigate(`/chat/${user._id}`)}
+    >
+      Message
+    </button>
+
+  </div>
+)}
 
     <div className="bio-section">
       <p>{user.bio}</p>
