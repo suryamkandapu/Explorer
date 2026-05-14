@@ -39,6 +39,9 @@ const Signin = () => {
       });
 
       if (res.data.success) {
+        if (res.data.token) {
+          localStorage.setItem('token', res.data.token);
+        }
         navigate('/home');
       } else {
         alert('Login failed');

@@ -58,6 +58,7 @@ const UserProfileTop = ({ user }) => {
       );
 
       if (res.data.success) {
+        localStorage.removeItem("token");
         navigate("/signin");
       } else {
         alert("Logout failed!");

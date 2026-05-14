@@ -16,6 +16,10 @@ const followingKey = (id) => `following:${id}`;
 const searchUsersKey = (query) =>
   `searchUsers:${query.toLowerCase()}`;
 
+const getAuthToken = (req) =>
+  req.cookies?.token ||
+  req.headers?.authorization?.split(" ")[1];
+
 // ✅ Signup
 const signupUser = async (req, res) => {
   try {
@@ -139,7 +143,7 @@ const signinUser = async (req, res) => {
 // ✅ Protected Route
 const protectedRoute = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
 
     if (!token) {
       return res.status(401).json({
@@ -173,7 +177,7 @@ const protectedRoute = async (req, res) => {
 // ✅ Fetch All Profiles
 const fetchAllProfiles = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
 
     if (!token) {
       return res.status(401).json({
@@ -394,7 +398,7 @@ const fetchFollowersCount = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
@@ -458,7 +462,7 @@ const fetchFollowersCount = async (req, res) => {
 // ✅ Logged In User
 const fetchLoggedInUser = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
@@ -586,7 +590,7 @@ const fetchUsersBySearch = async (req, res) => {
 // ✅ Update Bio
 const updateBio = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
 
     const decoded = jwt.verify(token, JWT_SECRET);
 

@@ -22,7 +22,9 @@ const uploadFile = async (req, res) => {
 
     const { description } = req.body;
 
-    const token = req.cookies.token;
+    const token =
+      req.cookies.token ||
+      req.headers.authorization?.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
@@ -85,7 +87,9 @@ const uploadFile = async (req, res) => {
 
 const getFeedData = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token =
+      req.cookies.token ||
+      req.headers.authorization?.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
@@ -224,7 +228,9 @@ const handleLikesOnPost = async (req, res) => {
       });
     }
 
-    const token = req.cookies.token;
+    const token =
+      req.cookies.token ||
+      req.headers.authorization?.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
@@ -298,7 +304,9 @@ const handleLikesOnPost = async (req, res) => {
 
 const handleDeletePost = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token =
+      req.cookies.token ||
+      req.headers.authorization?.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
