@@ -2,13 +2,25 @@ const onlineUsers = new Map();
 
 const socketHandlers = (io) => {
   io.on("connection", (socket) => {
-    console.log("✅ New socket connected:", socket.id);
+    console.log(
+      "✅ New socket connected:",
+      socket.id
+    );
 
     // ✅ Add user
     socket.on("addUser", (userId) => {
       if (!userId) return;
 
-      onlineUsers.set(userId, socket.id);
+      // ✅ store user -> socket mapping
+      onlineUsers.set(
+        userId.toString(),
+        socket.id
+      );
+
+      console.log(
+        "🟢 ONLINE USERS:",
+        Array.from(onlineUsers.entries())
+      );
 
       io.emit(
         "getOnlineUsers",
@@ -16,32 +28,80 @@ const socketHandlers = (io) => {
       );
     });
 
-    // ✅ Send message
+    // ✅ Send realtime message
     socket.on(
-      "sendMessage",
-      ({ senderId, receiverId, message }) => {
-        if (!receiverId || !message) return;
+  "sendMessage",
+  ({ senderId, receiverId, message }) => {
 
-        const receiverSocketId =
-          onlineUsers.get(receiverId);
+    console.log("📩 SEND MESSAGE EVENT");
 
-        if (receiverSocketId) {
-          io.to(receiverSocketId).emit(
-            "receiveMessage",
-            {
-              senderId,
-              message,
-            }
-          );
-        }
-      }
+    // ✅ DEBUG ONLINE USERS
+    console.log("ONLINE USERS:");
+    console.log(
+      Array.from(onlineUsers.entries())
     );
+
+    console.log("senderId:", senderId);
+    console.log("receiverId:", receiverId);
+    console.log("message:", message);
+
+    if (!receiverId || !message) {
+      console.log(
+        "❌ Missing receiverId or message"
+      );
+      return;
+    }
+
+    // ✅ get receiver socket
+    const receiverSocketId =
+      onlineUsers.get(
+        receiverId.toString()
+      );
+
+    console.log(
+      "receiverSocketId:",
+      receiverSocketId
+    );
+
+    // ✅ emit to receiver
+    if (receiverSocketId) {
+
+      io.to(receiverSocketId).emit(
+        "receiveMessage",
+        {
+          senderId,
+          message,
+        }
+      );
+
+      console.log(
+        "✅ Message emitted successfully"
+      );
+
+    } else {
+
+      console.log(
+        "❌ Receiver not online"
+      );
+    }
+  }
+);
 
     // ✅ Disconnect
     socket.on("disconnect", () => {
-      for (const [userId, socketId] of onlineUsers.entries()) {
+
+      for (const [
+        userId,
+        socketId,
+      ] of onlineUsers.entries()) {
+
         if (socketId === socket.id) {
           onlineUsers.delete(userId);
+
+          console.log(
+            `❌ User disconnected: ${userId}`
+          );
+
           break;
         }
       }
