@@ -1,24 +1,29 @@
 const Message = require("../Models/message");
 const Conversation = require("../Models/conversation.js");
 
-// ✅ Send message (save into DB)
+// ✅ Send message
 exports.sendMessage = async (req, res) => {
   try {
     const { conversationId, senderId, text } = req.body;
+
     const mediaUrl = req.file ? req.file.path : "";
 
+    // ✅ Validation
     if (!conversationId || !senderId) {
-      return res
-        .status(400)
-        .json({ message: "conversationId and senderId required" });
+      return res.status(400).json({
+        success: false,
+        message: "conversationId and senderId required",
+      });
     }
 
     if (!text && !mediaUrl) {
-      return res
-        .status(400)
-        .json({ message: "Either text or media required" });
+      return res.status(400).json({
+        success: false,
+        message: "Either text or media required",
+      });
     }
 
+    // ✅ Create message
     const newMessage = await Message.create({
       conversationId,
       senderId,
@@ -26,38 +31,68 @@ exports.sendMessage = async (req, res) => {
       image: mediaUrl || "",
     });
 
-    //  Update last message in conversation (for chat list preview)
-    const lastMessageText = text || (mediaUrl ? "📸 Shared a media" : "");
+    // ✅ Update conversation preview
+    const lastMessageText =
+      text || (mediaUrl ? "📸 Shared a media" : "");
+
     await Conversation.findByIdAndUpdate(conversationId, {
       lastMessage: lastMessageText,
       lastMessageSender: senderId,
       lastMessageAt: new Date(),
     });
 
-    // Populate sender info before sending response
-    const populatedMessage = await Message.findById(newMessage._id).populate("senderId", "fullName profilePic");
+    // ✅ Populate sender details
+    const populatedMessage = await Message.findById(
+      newMessage._id
+    ).populate("senderId", "fullName profilePic");
 
-    res.status(201).json(populatedMessage);
+    return res.status(201).json({
+      success: true,
+      message: "Message sent successfully",
+      data: populatedMessage,
+    });
+
   } catch (error) {
     console.error("Send message error:", error);
-    res.status(500).json({ message: "Error sending message", error });
+
+    return res.status(500).json({
+      success: false,
+      message: "Error sending message",
+      error: error.message,
+    });
   }
 };
 
-// Get messages of a conversation
-
+// ✅ Get messages of a conversation
 exports.getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
 
-    const messages = await Message.find({ conversationId })
+    if (!conversationId) {
+      return res.status(400).json({
+        success: false,
+        message: "conversationId is required",
+      });
+    }
+
+    const messages = await Message.find({
+      conversationId,
+    })
       .sort({ createdAt: 1 })
       .populate("senderId", "fullName profilePic");
 
-    res.status(200).json(messages);
+    return res.status(200).json({
+      success: true,
+      messages,
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Error fetching messages", error });
+    console.error("Get messages error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching messages",
+      error: error.message,
+    });
   }
 };
-
-

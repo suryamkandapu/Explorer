@@ -1,5 +1,6 @@
 const FeedModel = require("../Models/UserFeed.model");
 const jwt = require("jsonwebtoken");
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const { redisClient } = require("../Redis/redisClient");
@@ -22,6 +23,7 @@ const uploadFile = async (req, res) => {
     const { description } = req.body;
 
     const token = req.cookies.token;
+
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -29,8 +31,12 @@ const uploadFile = async (req, res) => {
       });
     }
 
-    if (!JWT_SECRET) throw new Error('JWT_SECRET not set');
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET not set");
+    }
+
     const decoded = jwt.verify(token, JWT_SECRET);
+
     const userId = decoded.id;
     const fullName = decoded.fullName;
     const userProfilePic = decoded.profilePic;
@@ -45,8 +51,8 @@ const uploadFile = async (req, res) => {
     const newFeed = new FeedModel({
       description: description || "",
       mediaUrl: req.file?.url || req.file?.path,
-      userId: userId,
-      fullName: fullName,
+      userId,
+      fullName,
       userProfilePic:
         userProfilePic ||
         "https://i.pinimg.com/736x/c0/74/9b/c0749b7cc401421662ae901ec8f9f660.jpg",
@@ -54,17 +60,21 @@ const uploadFile = async (req, res) => {
 
     await newFeed.save();
 
-    // ✅ Clear caches (because new post affects feed + user posts)
-    await redisClient.del(feedKey(userId));
-    await redisClient.del(userPostsKey(userId));
+    // ✅ Clear cache safely
+    if (redisClient) {
+      await redisClient.del(feedKey(userId));
+      await redisClient.del(userPostsKey(userId));
+    }
 
     return res.status(200).json({
       success: true,
       message: "File uploaded and saved to DB successfully",
       data: newFeed,
     });
+
   } catch (err) {
     console.error("File upload error:", err);
+
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -76,20 +86,36 @@ const uploadFile = async (req, res) => {
 const getFeedData = async (req, res) => {
   try {
     const token = req.cookies.token;
+
     if (!token) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
-    if (!JWT_SECRET) throw new Error('JWT_SECRET not set');
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET not set");
+    }
+
     const decoded = jwt.verify(token, JWT_SECRET);
+
     const userIdFromToken = decoded.id;
 
     if (!decoded || !userIdFromToken) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
-    // ✅ Try Redis Cache
-    const cached = await redisClient.get(feedKey(userIdFromToken));
+    // ✅ Redis cache safely
+    let cached = null;
+
+    if (redisClient) {
+      cached = await redisClient.get(feedKey(userIdFromToken));
+    }
+
     if (cached) {
       return res.status(200).json({
         success: true,
@@ -104,18 +130,26 @@ const getFeedData = async (req, res) => {
       userId: { $ne: userIdFromToken },
     }).sort({ createdAt: -1 });
 
-    // ✅ Cache for 60 seconds
-    await redisClient.setEx(feedKey(userIdFromToken), 60, JSON.stringify(feeds));
+    // ✅ Cache safely
+    if (redisClient) {
+      await redisClient.setEx(
+        feedKey(userIdFromToken),
+        60,
+        JSON.stringify(feeds)
+      );
+    }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Feed data retrieved successfully",
       data: feeds,
       currentUserId: userIdFromToken,
     });
+
   } catch (err) {
     console.error("Error fetching feeds:", err);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Server error",
       error: err.message,
@@ -134,8 +168,13 @@ const getUserPosts = async (req, res) => {
       });
     }
 
-    // ✅ Redis cache
-    const cached = await redisClient.get(userPostsKey(userId));
+    // ✅ Redis cache safely
+    let cached = null;
+
+    if (redisClient) {
+      cached = await redisClient.get(userPostsKey(userId));
+    }
+
     if (cached) {
       return res.status(200).json({
         success: true,
@@ -144,18 +183,29 @@ const getUserPosts = async (req, res) => {
       });
     }
 
-    const userPosts = await FeedModel.find({ userId }).sort({ createdAt: -1 });
+    const userPosts = await FeedModel.find({
+      userId,
+    }).sort({ createdAt: -1 });
 
-    // ✅ Cache for 60 seconds
-    await redisClient.setEx(userPostsKey(userId), 60, JSON.stringify(userPosts));
+    // ✅ Cache safely
+    if (redisClient) {
+      await redisClient.setEx(
+        userPostsKey(userId),
+        60,
+        JSON.stringify(userPosts)
+      );
+    }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "User posts retrieved successfully",
       userPosts,
     });
+
   } catch (err) {
-    res.status(500).json({
+    console.error("Get user posts error:", err);
+
+    return res.status(500).json({
       success: false,
       message: "Server error",
       error: err.message,
@@ -166,6 +216,7 @@ const getUserPosts = async (req, res) => {
 const handleLikesOnPost = async (req, res) => {
   try {
     const postId = req.params.postId;
+
     if (!postId) {
       return res.status(400).json({
         success: false,
@@ -174,6 +225,7 @@ const handleLikesOnPost = async (req, res) => {
     }
 
     const token = req.cookies.token;
+
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -181,45 +233,62 @@ const handleLikesOnPost = async (req, res) => {
       });
     }
 
-    if (!JWT_SECRET) throw new Error('JWT_SECRET not set');
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET not set");
+    }
+
     const decoded = jwt.verify(token, JWT_SECRET);
+
     const userIdFromToken = decoded.id;
 
     if (!decoded || !userIdFromToken) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
     const post = await FeedModel.findById(postId);
+
     if (!post) {
-      return res.status(404).json({ success: false, message: "Post not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
     }
 
-    const isLiked = post.likes.some((id) => id.toString() === userIdFromToken);
+    const isLiked = post.likes.some(
+      (id) => id.toString() === userIdFromToken
+    );
 
     if (isLiked) {
-      post.likes = post.likes.filter((id) => id.toString() !== userIdFromToken);
+      post.likes = post.likes.filter(
+        (id) => id.toString() !== userIdFromToken
+      );
     } else {
       post.likes.push(userIdFromToken);
     }
 
     await post.save();
 
-    // ✅ Clear cache for this post + liked profiles
-    await redisClient.del(postKey(postId));
-    await redisClient.del(likedProfilesKey(postId));
+    // ✅ Clear cache safely
+    if (redisClient) {
+      await redisClient.del(postKey(postId));
+      await redisClient.del(likedProfilesKey(postId));
+      await redisClient.del(feedKey(userIdFromToken));
+    }
 
-    // ✅ Clear feed cache for current user (because likes count changes UI)
-    await redisClient.del(feedKey(userIdFromToken));
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Post liked/unLiked successfully",
       liked: !isLiked,
       likesCount: post.likes.length,
     });
+
   } catch (err) {
     console.error("Error handling likes on post:", err);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Server error",
       error: err.message,
@@ -230,19 +299,31 @@ const handleLikesOnPost = async (req, res) => {
 const handleDeletePost = async (req, res) => {
   try {
     const token = req.cookies.token;
+
     if (!token) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
-    if (!JWT_SECRET) throw new Error('JWT_SECRET not set');
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET not set");
+    }
+
     const decoded = jwt.verify(token, JWT_SECRET);
+
     const userIdFromToken = decoded.id;
 
     if (!decoded || !userIdFromToken) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
     const postId = req.params.postId;
+
     if (!postId) {
       return res.status(400).json({
         success: false,
@@ -251,8 +332,12 @@ const handleDeletePost = async (req, res) => {
     }
 
     const post = await FeedModel.findById(postId);
+
     if (!post) {
-      return res.status(404).json({ success: false, message: "Post not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
     }
 
     if (post.userId.toString() !== userIdFromToken) {
@@ -264,20 +349,26 @@ const handleDeletePost = async (req, res) => {
 
     await FeedModel.findByIdAndDelete(postId);
 
-    // ✅ Clear caches
-    await redisClient.del(postKey(postId));
-    await redisClient.del(likedProfilesKey(postId));
-    await redisClient.del(userPostsKey(userIdFromToken));
-    await redisClient.del(feedKey(userIdFromToken));
+    // ✅ Clear cache safely
+    if (redisClient) {
+      await redisClient.del(postKey(postId));
+      await redisClient.del(likedProfilesKey(postId));
+      await redisClient.del(userPostsKey(userIdFromToken));
+      await redisClient.del(feedKey(userIdFromToken));
+    }
 
     return res.status(200).json({
       success: true,
       message: "Post deleted successfully",
     });
+
   } catch (err) {
+    console.error("Delete post error:", err);
+
     return res.status(500).json({
       success: false,
       message: "Internal server error",
+      error: err.message,
     });
   }
 };
@@ -286,8 +377,13 @@ const fetchPost = async (req, res) => {
   try {
     const postId = req.params.postId;
 
-    // ✅ Redis cache
-    const cached = await redisClient.get(postKey(postId));
+    // ✅ Redis cache safely
+    let cached = null;
+
+    if (redisClient) {
+      cached = await redisClient.get(postKey(postId));
+    }
+
     if (cached) {
       return res.status(200).json({
         success: true,
@@ -297,6 +393,7 @@ const fetchPost = async (req, res) => {
     }
 
     const post = await FeedModel.findById(postId);
+
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -304,18 +401,28 @@ const fetchPost = async (req, res) => {
       });
     }
 
-    // ✅ Cache for 60 seconds
-    await redisClient.setEx(postKey(postId), 60, JSON.stringify(post));
+    // ✅ Cache safely
+    if (redisClient) {
+      await redisClient.setEx(
+        postKey(postId),
+        60,
+        JSON.stringify(post)
+      );
+    }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Post fetched successfully",
       post,
     });
+
   } catch (err) {
-    res.status(500).json({
+    console.error("Fetch post error:", err);
+
+    return res.status(500).json({
       success: false,
       message: "Internal Server Error",
+      error: err.message,
     });
   }
 };
@@ -324,8 +431,13 @@ const fetchLikedProfiles = async (req, res) => {
   try {
     const { postId } = req.params;
 
-    // ✅ Redis cache
-    const cached = await redisClient.get(likedProfilesKey(postId));
+    // ✅ Redis cache safely
+    let cached = null;
+
+    if (redisClient) {
+      cached = await redisClient.get(likedProfilesKey(postId));
+    }
+
     if (cached) {
       return res.status(200).json({
         success: true,
@@ -340,22 +452,29 @@ const fetchLikedProfiles = async (req, res) => {
     );
 
     if (!post) {
-      return res.status(404).json({ success: false, message: "Post not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
     }
 
-    // ✅ Cache 60 seconds
-    await redisClient.setEx(
-      likedProfilesKey(postId),
-      60,
-      JSON.stringify(post.likes)
-    );
+    // ✅ Cache safely
+    if (redisClient) {
+      await redisClient.setEx(
+        likedProfilesKey(postId),
+        60,
+        JSON.stringify(post.likes)
+      );
+    }
 
     return res.status(200).json({
       success: true,
       likedProfiles: post.likes,
     });
+
   } catch (err) {
     console.error("Fetch liked profiles error:", err);
+
     return res.status(500).json({
       success: false,
       message: "Server error",
