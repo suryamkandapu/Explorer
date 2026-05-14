@@ -120,18 +120,18 @@ const signinUser = async (req, res) => {
 
     // Set cookie – Safari‑friendly configuration
     return res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,        // keep HTTPS only
-        sameSite: "Lax",    // works with Safari and avoids cross‑site blocking
-        maxAge: 24 * 60 * 60 * 1000,
-      })
-      .status(200)
-      .json({
-        success: true,
-        message: "User logged in successfully",
-        token,
-      });
+  .cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    maxAge: 24 * 60 * 60 * 1000,
+  })
+  .status(200)
+  .json({
+    success: true,
+    message: "User logged in successfully",
+    token,
+  });
 
   } catch (err) {
     console.error("Signin error:", err);
