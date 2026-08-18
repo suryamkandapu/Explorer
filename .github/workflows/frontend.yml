@@ -10,12 +10,27 @@ jobs:
   deploy-frontend:
     runs-on: [ self-hosted ]
     steps:
+      - name: Backup Frontend .env
+        run: |
+          if [ -f Frontend/.env ]; then
+            cp Frontend/.env /tmp/frontend_env_backup
+          fi
+
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Restore Frontend .env
+        run: |
+          if [ -f /tmp/frontend_env_backup ]; then
+            mv /tmp/frontend_env_backup Frontend/.env
+          fi
 
       - name: Install & Build Frontend
         run: |
           cd Frontend
           npm install
           npm run build
+          sudo mkdir -p /var/www/explorer
+          sudo cp -r dist/* /var/www/explorer/
+          sudo chown -R www-data:www-data /var/www/explorer
           sudo systemctl reload nginx
