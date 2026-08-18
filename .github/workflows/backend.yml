@@ -10,12 +10,24 @@ jobs:
   deploy-backend:
     runs-on: [ self-hosted ]
     steps:
+      - name: Backup Backend .env
+        run: |
+          if [ -f Backend/.env ]; then
+            cp Backend/.env /tmp/backend_env_backup
+          fi
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Dependencies & Restart Service
+      - name: Restore Backend .env
+        run: |
+          if [ -f /tmp/backend_env_backup ]; then
+            mv /tmp/backend_env_backup Backend/.env
+          fi
+
+      - name: Install & Restart Backend
         run: |
           cd Backend
           npm install
-          pm2 restart explorer-backend --update-env || pm2 start index.js --name explorer-backend
+          pm2 restart explorer-backend --update-env
           pm2 save
