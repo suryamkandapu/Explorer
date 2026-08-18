@@ -1,0 +1,21 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
+
+jobs:
+  deploy-backend:
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies & Restart Service
+        run: |
+          cd Backend
+          npm install
+          pm2 restart explorer-backend --update-env || pm2 start index.js --name explorer-backend
+          pm2 save

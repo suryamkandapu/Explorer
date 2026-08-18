@@ -4,7 +4,7 @@ const router = express.Router();
 // remove OpenAI/test route; Gemini only
 
 // Gemini integration
-const { askGroq } = require("../AI/groqAgent");
+const  askGroq  = require("../AI/groqAgent");
 const AIChat = require("../Models/aiChat.model");
 
 // legacy test endpoint removed; only Gemini routes remain

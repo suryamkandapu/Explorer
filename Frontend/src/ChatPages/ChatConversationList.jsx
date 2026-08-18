@@ -82,12 +82,12 @@ const ChatConversationList = () => {
       <Link to="/chat/gemini">
         <img
           src="https://api.dicebear.com/7.x/bottts/svg?seed=GeminiAI&scale=80"
-          alt="Gemini AI"
+          alt= 'AI ChatBot'
           className="chat-user-avatar"
           onError={(e) => (e.target.remove())}
         />
         <div className="chat-user-info">
-          <p className="chat-user-name">Gemini AI</p>
+          <p className="chat-user-name">AI ChatBot</p>
           <p className="chat-user-subtext">Ask me anything</p>
         </div>
       </Link>

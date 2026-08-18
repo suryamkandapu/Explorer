@@ -111,7 +111,7 @@ const AIChat = () => {
             onError={(e) => (e.target.remove())}
           />
           <div className="chat-header-info">
-            <p className="chat-header-name">Gemini AI</p>
+            <p className="chat-header-name">AI ChatBot</p>
             <p className="chat-header-status">AI assistant</p>
           </div>
         </div>

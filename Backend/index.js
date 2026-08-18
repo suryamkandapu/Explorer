@@ -32,7 +32,8 @@ app.set("trust proxy", 1);
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://explorer-k7p9.onrender.com"
+    "https://explorer-k7p9.onrender.com",
+    "http://localhost:5174"
   ],
   credentials: true
 }));
