@@ -36,7 +36,8 @@ app.use(cors({
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
   "http://13.235.77.45",
-  "http://13.235.77.45:8000"
+  "http://13.235.77.45:8000",
+    "https://explorer-k7p9.onrender.com"
   ],
   credentials: true
 }));
